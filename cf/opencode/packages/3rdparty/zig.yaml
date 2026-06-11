@@ -1,0 +1,9 @@
+provides: compiler/zig
+sources:
+    git:
+        url:    https://github.com/ziglang/zig.git
+        ref:    master
+        depth:  1
+        fetch:
+          - refs/heads/master:refs/remotes/origin/master
+buildsystem: cmake

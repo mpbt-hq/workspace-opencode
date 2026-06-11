@@ -1,0 +1,30 @@
+sources:
+    git:
+        # origin: our (metux/oss-qm) fork — the branch we build and push to.
+        url:    git@github.com:oss-qm/bun-bootstrap.git
+        ref:    mtx/master
+        depth:  1
+        fetch:
+          - refs/heads/mtx/master:refs/remotes/origin/mtx/master
+        # bmwalters: the upstream the fork is based on, kept as a second remote
+        # for diffing / rebasing / submitting the patches back upstream.
+        remotes:
+            bmwalters:
+                url:    https://github.com/bmwalters/bun/
+                depth:  1
+                fetch:
+                  - refs/heads/dev/codegen-runtime-agnostic:refs/remotes/bmwalters/dev/codegen-runtime-agnostic
+buildsystem: cmake
+depends:
+    - 3rdparty/zig
+
+cmake-args:
+    - -GNinja
+    - -DCMAKE_BUILD_TYPE=Debug
+    - -DUSE_PREBUILT_WEBKIT=OFF
+    - -DBUN_DOWNLOAD_WEBKIT=OFF
+    - -DNODE_EXECUTABLE=${install-prefix}/bin/node
+    - -DNPM_EXECUTABLE=${@PROJECT::@workdir}/sources/3rdparty/bun-bootstrap/cmake/npm-wrapper.sh
+    - -DCODEGEN_EMBED=ON
+    - -DCODEGEN_OUTPUTS=codegen
+    - -DBUN_EXECUTABLE=${@PROJECT::@workdir}/sources/3rdparty/bun-bootstrap/cmake/bun-node-wrapper.sh

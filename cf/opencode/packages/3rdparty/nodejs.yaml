@@ -1,0 +1,28 @@
+provides: compiler/zig
+sources:
+    git:
+#        url:    https://salsa.debian.org/js-team/nodejs.git
+#        ref:    debian/24.15.0+dfsg+_cs24.12.2-1
+        url:    https://github.com/nodejs/node.git
+        ref:    v26.3.0
+        depth:  1
+        fetch:
+          - refs/tags/v26.3.0:refs/tags/v26.3.0
+buildsystem: autotools
+
+autoconf-args:
+    # small-icu (node's default, bundled offline in deps/icu-small) rather than
+    # none: V8's Unicode property escapes (e.g. /\p{Surrogate}/u) require i18n
+    # support, which --with-intl=none strips. opencode's web UI build (vite)
+    # uses such regexes and fails under an intl-less node.
+    - --with-intl=small-icu
+    - --shared-zlib
+
+post-checkout-cmd:
+    - git
+    - submodule
+    - update
+    - --init
+    - --recursive
+
+skip-prepare: true

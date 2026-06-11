@@ -1,0 +1,32 @@
+sources:
+    git:
+        url:    https://github.com/sst/opencode.git
+        ref:    refs/tags/v1.17.7
+        depth:  1
+        fetch:
+          - refs/tags/v1.17.7:refs/tags/v1.17.7
+
+# opencode is a bun monorepo. It is built with bun itself (packageManager
+# bun@1.3.14), which we provide via 3rdparty/bun installed into the prefix.
+buildsystem: exec
+depends:
+    - 3rdparty/bun
+
+commands:
+    # Install the whole workspace dependency tree.
+    configure:
+        - sh
+        - -c
+        - export PATH="${install-prefix}/bin:$PATH"; bun install
+    # Build a standalone opencode binary for this host (--single). build.ts uses
+    # `bun` from PATH internally (bun install, Bun.build --compile, smoke test),
+    # so the prefix bin must be on PATH.
+    build:
+        - sh
+        - -c
+        - export PATH="${install-prefix}/bin:$PATH"; cd packages/opencode && bun run script/build.ts --single
+    # Install the compiled binary into the prefix.
+    install:
+        - sh
+        - -c
+        - install -D -m755 packages/opencode/dist/opencode-linux-x64/bin/opencode "$DESTDIR${install-prefix}/bin/opencode"

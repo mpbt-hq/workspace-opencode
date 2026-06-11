@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# needed for zig
+sudo apt-get install -y clang-21 llvm-21 lld-21 libjavascriptcoregtk-4.1-dev
+
+# nightly Rust toolchain (rustup), needed by 3rdparty/bun's *release* build:
+# it builds the lolhtml dependency with -Zbuild-std / -Cpanic=immediate-abort,
+# which are nightly-only. bun's rust-toolchain.toml pins the exact nightly +
+# rust-src; rustup installs them on demand. bun's build prefers ~/.cargo/bin/cargo
+# over a distro cargo, so a user-local rustup install is sufficient (no sudo).
+if ! [ -x "$HOME/.cargo/bin/rustup" ]; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+        sh -s -- -y --default-toolchain none --profile minimal
+fi

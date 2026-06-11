@@ -1,0 +1,25 @@
+# needed by several sources
+xlibre_git:     git@github.com:X11Libre
+
+install-prefix: ${@PROJECT::@workdir}/target
+
+build:
+    - 3rdparty/zig
+    - 3rdparty/nodejs
+    - 3rdparty/bun-bootstrap
+    - 3rdparty/bun
+    - opencode/opencode
+
+env:
+    PKG_CONFIG_PATH: ${install-prefix}/share/pkgconfig:${install-prefix}/lib/pkgconfig:${install-prefix}/lib/${@PROJECT::@machine}/pkgconfig/
+    ACLOCAL_PATH: ${install-prefix}/share/aclocal
+    ACLOCAL_FLAGS: -I ${install-prefix}/share/aclocal
+    # bun-bootstrap is a debug+logs build; silence its syscall tracing when it
+    # is used as the build tool for 3rdparty/bun (otherwise stderr explodes).
+    BUN_DEBUG_QUIET_LOGS: "1"
+    # node used by bun-bootstrap's cmake/bun-node-wrapper.sh + npm-wrapper.sh
+    # (codegen via node+tsx). Lets the wrappers avoid hardcoded paths.
+    BUN_BOOTSTRAP_NODE: ${install-prefix}/bin/node
+
+packages:
+    - ${@PROJECT::@rootdir}/cf/opencode/packages
